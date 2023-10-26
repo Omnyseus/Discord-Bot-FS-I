@@ -5,6 +5,7 @@ using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
 using DSharpPlus.SlashCommands;
 using DSharpPlus.SlashCommands.EventArgs;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -24,12 +25,13 @@ public class DiscordBotService : IHostedService
 
     #region Constructors
 
-    public DiscordBotService(IServiceProvider serviceProvider, ILogger<DiscordBotService> logger)
+    public DiscordBotService(IServiceProvider serviceProvider, ILogger<DiscordBotService> logger, IConfiguration config)
     {
         _logger = logger;
+
         _client = new DiscordClient(new DiscordConfiguration
         {
-            Token = "TODO - injected",
+            Token = config["Token"] ?? throw new InvalidOperationException("Discord Bot Token is missing in the config.json"),
             TokenType = TokenType.Bot,
             Intents = DiscordIntents.AllUnprivileged | DiscordIntents.MessageContents,
             LoggerFactory = new MLoggerFactory().AddSerilog(LoggerFactory.ForUnknownContext()),

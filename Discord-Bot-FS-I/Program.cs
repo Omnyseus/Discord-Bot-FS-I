@@ -1,4 +1,5 @@
 ﻿using Discord_Bot_FS_I.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -25,7 +26,13 @@ internal static class Program
 
         services.AddLogging(builder => builder.AddSerilog(LoggerFactory.ForUnknownContext()));
 
-        services.AddHostedService<DiscordBotService>()
+        var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("config.json", false)
+            .Build();
+
+        services.AddSingleton<IConfiguration>(config)
             .AddSingleton<MongoDBService>();
+
+        services.AddHostedService<DiscordBotService>();
     }
 }
